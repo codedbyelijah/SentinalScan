@@ -105,7 +105,7 @@ class TargetValidator:
     @staticmethod
     def _is_url(target: str) -> bool:
         """Check if target looks like a URL."""
-        return target.startswith(('http://', 'https://', '://'))
+        return target.startswith(('http://', 'https://'))
     
     @staticmethod
     def _is_domain(target: str) -> bool:
