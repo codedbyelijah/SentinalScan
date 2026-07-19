@@ -184,7 +184,7 @@ class ReachabilityChecker:
             if system == "linux":
                 match = re.search(r'rtt min/avg/max/mdev = [\d.]+/([\d.]+)/[\d.]+/[\d.]+ ms', output)
                 if match:
-                    return float(match.group(1))
+                    return float(match.group(2))
             
             return None
         except Exception:
