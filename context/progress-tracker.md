@@ -28,18 +28,23 @@ Update this file after every meaningful implementation change.
 - UML diagrams completed.
 - Implementation roadmap completed.
 - Shared Models implemented and verified.
+- Target Validation implemented and verified.
+- Reachability Check implemented and verified.
+- Scan Module Interface implemented and verified.
+- Scan Orchestrator implemented and verified.
+- Scan Configuration implemented and verified.
+- Port Scanner implemented and verified.
+- Service Detection implemented and verified.
+- HTTP Probe implemented and verified.
 
 ## In Progress
 
-- Implementing Target Validation.
+- Implementing remaining concrete scan modules.
 
 ## Next Up
 
-- Implement Target Validation.
-- Implement Reachability Check.
-- Implement Scan Module Interface.
-- Implement Scan Orchestrator.
-- Implement Scan Configuration.
+- Implement concrete scan modules.
+- Implement Report generation.
 
 ## Open Questions
 
@@ -71,6 +76,7 @@ Update this file after every meaningful implementation change.
 | Context Files           | ✅ Complete    |
 | Feature Specifications  | ✅ Complete    |
 | Shared Models           | ✅ Complete    |
+| Target Validation       | ✅ Complete    |
 | Backend Implementation  | ⏳ In Progress |
 | Frontend Implementation | ⏳ Not Started |
 | CLI Implementation      | ⏳ Not Started |
