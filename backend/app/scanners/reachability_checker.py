@@ -3,7 +3,6 @@ import platform
 import re
 import subprocess
 import time
-from typing import Literal
 
 import httpx
 
@@ -91,13 +90,6 @@ class ReachabilityChecker:
                 response_time_ms=None,
                 method_used="http"
             )
-        except httpx.HTTPStatusError:
-            # Expected failure - server responded with error
-            return ReachabilityResult(
-                reachable=False,
-                response_time_ms=None,
-                method_used="http"
-            )
         except Exception as e:
             # Unexpected failure - raise error
             raise ReachabilityError(f"HTTP check failed: {str(e)}")
@@ -150,6 +142,9 @@ class ReachabilityChecker:
                 
         except asyncio.TimeoutError:
             # Expected failure - timeout
+            # Clean up process if it's still running
+            if process.returncode is None:
+                process.kill()
             return ReachabilityResult(
                 reachable=False,
                 response_time_ms=None,
