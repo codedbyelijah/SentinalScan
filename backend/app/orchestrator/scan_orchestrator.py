@@ -6,6 +6,7 @@ from typing import List
 from app.models.enums import ScanMode, Status
 from app.models.scan_request import ScanRequest
 from app.models.scan_result import ScanResult
+from app.models.target import Target
 from app.scanners.scan_module import ScanModule
 
 logger = logging.getLogger(__name__)
@@ -82,7 +83,7 @@ class ScanOrchestrator:
     async def _run_modules_concurrently(
         self, 
         modules: dict, 
-        target
+        target: Target
     ) -> List[ScanResult]:
         """
         Run scan modules concurrently using asyncio.gather.
@@ -120,7 +121,7 @@ class ScanOrchestrator:
         
         return successful_results
     
-    async def _run_single_module(self, module: ScanModule, target) -> ScanResult:
+    async def _run_single_module(self, module: ScanModule, target: Target) -> ScanResult:
         """
         Execute a single scan module with timing and logging.
         
@@ -129,10 +130,7 @@ class ScanOrchestrator:
             target: The target to scan
             
         Returns:
-            ScanResult from the module
-            
-        Raises:
-            Exception: If the module execution fails
+            ScanResult from the module (with FAILED status if execution fails)
         """
         module_name = module.__class__.__name__
         logger.info(f"Starting module: {module_name}")
