@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from pydantic import BaseModel, Field
 
 from app.models.enums import Status
@@ -13,7 +13,7 @@ class Report(BaseModel):
         description="The target that was scanned"
     )
     generated_at: datetime = Field(
-        default_factory=datetime.utcnow,
+        default_factory=lambda: datetime.now(timezone.utc),
         description="Timestamp when the report was generated"
     )
     scan_duration: float = Field(

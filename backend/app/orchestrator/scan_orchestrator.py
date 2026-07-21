@@ -1,7 +1,6 @@
 import asyncio
 import logging
 import time
-from typing import List
 
 from app.models.enums import ScanMode, Status
 from app.models.scan_request import ScanRequest
@@ -21,7 +20,7 @@ class ScanOrchestrator:
     modules fail.
     """
     
-    def __init__(self, modules: List[ScanModule]):
+    def __init__(self, modules: list[ScanModule]):
         """
         Initialize the orchestrator with available scan modules.
         
@@ -31,7 +30,7 @@ class ScanOrchestrator:
         self.modules = {module.__class__.__name__: module for module in modules}
         logger.info(f"ScanOrchestrator initialized with {len(self.modules)} modules")
     
-    async def execute_scan(self, scan_request: ScanRequest) -> List[ScanResult]:
+    async def execute_scan(self, scan_request: ScanRequest) -> list[ScanResult]:
         """
         Execute scan for the given request.
         
@@ -54,7 +53,7 @@ class ScanOrchestrator:
         logger.info(f"Scan completed. {len(results)} results collected")
         return results
     
-    def _get_modules_to_run(self, scan_request: ScanRequest) -> dict:
+    def _get_modules_to_run(self, scan_request: ScanRequest) -> dict[str, ScanModule]:
         """
         Determine which modules should run based on scan mode.
         
@@ -82,9 +81,9 @@ class ScanOrchestrator:
     
     async def _run_modules_concurrently(
         self, 
-        modules: dict, 
+        modules: dict[str, ScanModule], 
         target: Target
-    ) -> List[ScanResult]:
+    ) -> list[ScanResult]:
         """
         Run scan modules concurrently using asyncio.gather.
         

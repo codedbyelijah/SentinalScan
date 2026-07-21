@@ -1,5 +1,4 @@
 import time
-from typing import Optional
 
 import httpx
 
@@ -48,13 +47,13 @@ class HttpProbe(ScanModule):
         
         try:
             # Determine which protocols to try
-            protocols = self._determine_protocols(target)
+            protocols = self.determine_protocols(target)
             
             # Try each protocol until one succeeds
             result = None
             for protocol in protocols:
                 try:
-                    result = await self._probe_http(target, protocol)
+                    result = await self.probe_http(target, protocol)
                     if result:
                         break
                 except Exception:
@@ -100,7 +99,7 @@ class HttpProbe(ScanModule):
             findings=findings
         )
     
-    def _determine_protocols(self, target: Target) -> list[str]:
+    def determine_protocols(self, target: Target) -> list[str]:
         """
         Determine which protocols to try based on the target.
         
@@ -120,7 +119,7 @@ class HttpProbe(ScanModule):
             # Try HTTPS first, then HTTP
             return ["https", "http"]
     
-    async def _probe_http(self, target: Target, protocol: str) -> Optional[dict]:
+    async def probe_http(self, target: Target, protocol: str) -> dict | None:
         """
         Perform HTTP probe with the specified protocol.
         
