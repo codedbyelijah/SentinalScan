@@ -1,7 +1,6 @@
 import asyncio
 import socket
 import time
-from typing import Optional
 
 from app.models.enums import Category, Severity, Status
 from app.models.finding import Finding
@@ -251,7 +250,7 @@ class ServiceDetection(ScanModule):
         
         return detected
     
-    def _identify_from_banner(self, banner: str) -> Optional[str]:
+    def _identify_from_banner(self, banner: str) -> str | None:
         """
         Identify service from banner string.
         

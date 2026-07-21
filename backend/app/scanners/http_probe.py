@@ -1,5 +1,4 @@
 import time
-from typing import Optional
 
 import httpx
 
@@ -120,7 +119,7 @@ class HttpProbe(ScanModule):
             # Try HTTPS first, then HTTP
             return ["https", "http"]
     
-    async def _probe_http(self, target: Target, protocol: str) -> Optional[dict]:
+    async def _probe_http(self, target: Target, protocol: str) -> dict | None:
         """
         Perform HTTP probe with the specified protocol.
         

@@ -1,5 +1,3 @@
-from typing import List
-
 from app.models.enums import ScanMode
 from app.models.scan_request import ScanRequest
 from app.models.target import Target
@@ -21,7 +19,7 @@ class ScanConfiguration:
     ScanRequest models compatible with the Scan Orchestrator.
     """
     
-    def __init__(self, available_modules: List[str]):
+    def __init__(self, available_modules: list[str]):
         """
         Initialize the configuration service with available modules.
         
@@ -51,7 +49,7 @@ class ScanConfiguration:
             enabled_modules=[]
         )
     
-    def create_custom_scan(self, target: Target, enabled_modules: List[str]) -> ScanRequest:
+    def create_custom_scan(self, target: Target, enabled_modules: list[str]) -> ScanRequest:
         """
         Create a Custom Scan configuration.
         
