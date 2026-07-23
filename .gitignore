@@ -76,7 +76,4 @@ Thumbs.db
 *.swp
 *~.nib
 
-# Generated files
-*.pdf
-*.html
-reports/
+

@@ -41,21 +41,19 @@ Update this file after every meaningful implementation change.
 - SSL Scanner implemented and verified.
 - Technology Detector implemented and verified.
 - Content Discovery implemented and verified.
+- Result Normalizer implemented and verified.
+- Risk Analyzer implemented and verified.
+- Report Generator implemented and verified.
 
 ## In Progress
 
-- Implementing remaining concrete scan modules.
+- Implementing remaining backend services.
 
 ## Next Up
-
-- Implement Result Normalizer (feature 15)
-- Implement Risk Analyzer (feature 16)
-- Implement Report generation (feature 17)
 
 ## Open Questions
 
 - Define the technology detection heuristics.
-- Finalize the risk scoring methodology.
 - Determine the level of customization available for Custom Scan profiles.
 
 ## Architecture Decisions
