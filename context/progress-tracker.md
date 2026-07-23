@@ -40,6 +40,7 @@ Update this file after every meaningful implementation change.
 - HTTP Method Scanner implemented and verified.
 - SSL Scanner implemented and verified.
 - Technology Detector implemented and verified.
+- Content Discovery implemented and verified.
 
 ## In Progress
 
@@ -47,8 +48,9 @@ Update this file after every meaningful implementation change.
 
 ## Next Up
 
-- Implement concrete scan modules.
-- Implement Report generation.
+- Implement Result Normalizer (feature 15)
+- Implement Risk Analyzer (feature 16)
+- Implement Report generation (feature 17)
 
 ## Open Questions
 

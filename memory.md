@@ -169,6 +169,19 @@ Last updated: July 21, 2026
 - Graceful error handling with Status.FAILED on unreachable targets
 - **Code quality fix:** Added response_body and cookies to HttpProbe.probe_http() return dict for TechnologyDetector
 
+**Content Discovery (backend/app/scanners/)**
+
+- `content_discovery.py` - ContentDiscovery class implementing ScanModule interface
+- Content discovery using httpx for HTTP requests
+- Checks common resources: robots.txt, sitemap.xml, favicon.ico, security.txt, .well-known/security.txt
+- Checks administrative pages: admin, login, dashboard, wp-admin, administrator, etc.
+- Checks common directories for exposed directory listings: /, /images, /uploads, /files, /assets, /static, /public, /backup, /backups, /tmp, /temp
+- Concurrent path checking using asyncio.gather for performance
+- Directory listing detection based on HTML indicators (Index of /, Directory listing for, Parent Directory, etc.)
+- Configurable timeout (default 10.0s) with validation
+- Graceful error handling with Status.FAILED on unreachable targets
+- Returns findings for discovered resources, administrative pages, and exposed directory listings
+
 **Project Setup**
 
 - Created `.gitignore` with Python, Node.js, Next.js, IDE exclusions
@@ -236,6 +249,7 @@ Last updated: July 21, 2026
 - HTTP Method Scanner implemented, tested, and verified
 - SSL Scanner implemented, tested, and verified
 - Technology Detector implemented, tested, and verified
+- Content Discovery implemented, tested, and verified
 - Git branch "backend" created and pushed to origin
 - Architecture.md updated to match current structure
 - Code reviews completed - critical bugs fixed
