@@ -28,18 +28,26 @@ Update this file after every meaningful implementation change.
 - UML diagrams completed.
 - Implementation roadmap completed.
 - Shared Models implemented and verified.
+- Target Validation implemented and verified.
+- Reachability Check implemented and verified.
+- Scan Module Interface implemented and verified.
+- Scan Orchestrator implemented and verified.
+- Scan Configuration implemented and verified.
+- Port Scanner implemented and verified.
+- Service Detection implemented and verified.
+- HTTP Probe implemented and verified.
+- Security Header Scanner implemented and verified.
+- HTTP Method Scanner implemented and verified.
+- SSL Scanner implemented and verified.
 
 ## In Progress
 
-- Implementing Target Validation.
+- Implementing remaining concrete scan modules.
 
 ## Next Up
 
-- Implement Target Validation.
-- Implement Reachability Check.
-- Implement Scan Module Interface.
-- Implement Scan Orchestrator.
-- Implement Scan Configuration.
+- Implement remaining concrete scan modules (Technology Detector).
+- Implement Report generation.
 
 ## Open Questions
 

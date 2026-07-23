@@ -138,6 +138,24 @@ Last updated: July 21, 2026
 - Configurable timeout (default 10.0s) with validation
 - Graceful error handling with Status.FAILED on unreachable targets
 
+**SSL Scanner (backend/app/scanners/)**
+
+- `ssl_scanner.py` - SSLScanner class implementing ScanModule interface
+- SSL/TLS certificate analysis using Python's built-in ssl module and socket
+- Extracts hostname and port from target URL (supports non-standard HTTPS ports)
+- Retrieves certificate information: subject, issuer, valid from, expiration date, TLS version
+- Detects expired certificates (Severity.HIGH)
+- Detects certificates nearing expiration within 30 days (Severity.MEDIUM)
+- Flags deprecated TLS versions (TLS 1.0, 1.1) as HIGH severity
+- Returns Status.FAILED for HTTP targets (SSL/TLS requires HTTPS)
+- Configurable timeout (default 10.0s) with validation
+- Graceful error handling with Status.FAILED on certificate retrieval failures
+- **Code quality fix:** Fixed datetime comparison error by making parsed SSL dates timezone-aware (UTC)
+- **Code quality fix:** Added None checks before strftime() calls to prevent AttributeError
+- **Code quality fix:** Fixed typo in near-expiry description
+- **Code quality fix:** Made \_get_certificate_info() synchronous (uses blocking socket operations)
+- **Code quality fix:** Added port extraction from target URL to support non-standard HTTPS ports
+
 **Project Setup**
 
 - Created `.gitignore` with Python, Node.js, Next.js, IDE exclusions
@@ -203,6 +221,7 @@ Last updated: July 21, 2026
 - HTTP Probe implemented, tested, and verified
 - Security Header Scanner implemented, tested, and verified
 - HTTP Method Scanner implemented, tested, and verified
+- SSL Scanner implemented, tested, and verified
 - Git branch "backend" created and pushed to origin
 - Architecture.md updated to match current structure
 - Code reviews completed - critical bugs fixed
@@ -213,12 +232,12 @@ Last updated: July 21, 2026
 
 **Next:**
 
-- Implement remaining concrete scan modules (SSL Scanner, Technology Detector)
+- Implement remaining concrete scan modules (Technology Detector)
 - Implement Report generation
 
 ## Next session starts with
 
-Implement SSL Scanner (context/feature-spec/12-ssl-scanner.md) following the same pattern as previous scan modules.
+Implement Technology Detector (context/feature-spec/13-technology-detector.md) following the same pattern as previous scan modules.
 
 ## Open questions
 
