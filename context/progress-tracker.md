@@ -43,14 +43,13 @@ Update this file after every meaningful implementation change.
 - Content Discovery implemented and verified.
 - Result Normalizer implemented and verified.
 - Risk Analyzer implemented and verified.
+- Report Generator implemented and verified.
 
 ## In Progress
 
 - Implementing remaining backend services.
 
 ## Next Up
-
-- Implement Report generation (feature 17)
 
 ## Open Questions
 
