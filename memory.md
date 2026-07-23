@@ -246,6 +246,7 @@ Last updated: July 21, 2026
 
 **Next:**
 
+- Implement remaining concrete scan modules (HTTP Probe, Security Header Scanner, SSL Scanner, Technology Detector)
 - Implement Report generation
 
 ## Next session starts with

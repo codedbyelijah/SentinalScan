@@ -21,10 +21,14 @@
 ## System Boundaries
 
 - `frontend/` — Owns the web user interface, user interactions, scan configuration, progress display, and report viewing.
-- `backend/` — Owns API endpoints, request handling, scan orchestration, validation, and report generation.
-- `backend/scanners/` — Owns port scanning, reachability checking, web security analysis, SSL/TLS analysis, and technology detection modules.
-- `backend/reports/` — Owns report formatting and PDF generation.
-- `backend/core/` — Owns shared utilities including configuration, validation, logging, helper functions, and common models.
+- `backend/app/` — Main application directory containing all backend code.
+- `backend/app/models/` — Owns shared Pydantic models and enums used across the backend.
+- `backend/app/services/` — Owns validation services and business logic (e.g., target validation).
+- `backend/app/scanners/` — Owns port scanning, reachability checking, web security analysis, SSL/TLS analysis, and technology detection modules.
+- `backend/app/reports/` — Owns report formatting and PDF generation.
+- `backend/app/core/` — Owns shared utilities including configuration, logging, helper functions.
+- `backend/app/api/` — Owns FastAPI routes and request handling.
+- `backend/app/orchestrator/` — Owns scan orchestration and workflow management.
 - `cli/` — Owns command-line commands and communicates directly with backend services.
 
 ## Storage Model
