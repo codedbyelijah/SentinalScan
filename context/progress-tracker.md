@@ -36,6 +36,10 @@ Update this file after every meaningful implementation change.
 - Port Scanner implemented and verified.
 - Service Detection implemented and verified.
 - HTTP Probe implemented and verified.
+- Security Header Scanner implemented and verified.
+- HTTP Method Scanner implemented and verified.
+- SSL Scanner implemented and verified.
+- Technology Detector implemented and verified.
 
 ## In Progress
 

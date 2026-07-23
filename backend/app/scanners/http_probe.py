@@ -165,7 +165,9 @@ class HttpProbe(ScanModule):
                 "response_time": response.elapsed.total_seconds(),
                 "redirect_chain": redirect_chain,
                 "server_header": response.headers.get("Server", ""),
-                "response_headers": dict(response.headers)
+                "response_headers": dict(response.headers),
+                "response_body": response.text,
+                "cookies": dict(response.cookies)
             }
     
     def _create_findings(self, target: Target, result: dict) -> list[Finding]:

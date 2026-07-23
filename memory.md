@@ -1,6 +1,6 @@
 # Memory — SentinelScan Backend Implementation
 
-Last updated: July 20, 2026
+Last updated: July 21, 2026
 
 ## What was built
 
@@ -92,6 +92,83 @@ Last updated: July 20, 2026
 - Uses asyncio.get_running_loop() (current Python 3.13 compatible)
 - Graceful error handling with Status.FAILED on unexpected errors
 
+**HTTP Probe (backend/app/scanners/)**
+
+- `http_probe.py` - HttpProbe class implementing ScanModule interface
+- Async HTTP probing using httpx library
+- Respects target protocol if specified (http:// or https://), otherwise tries HTTPS then HTTP
+- Configurable timeout (default 10.0s) with validation
+- Extracts final URL, status code, response time, redirect chain, server header, response headers
+- Multiple findings: basic HTTP info, redirect chain (if exists), server header, response headers
+- All findings use Category.WEB_SECURITY and Severity.INFO
+- Redirect chain recorded as list of URLs with status codes
+- Response headers recorded only from final response (not intermediate redirects)
+- Graceful error handling with Status.FAILED on unreachable targets
+- **Code quality fix:** Made probe_http() method public (renamed from \_probe_http) for reuse by other scanners
+
+**Security Header Scanner (backend/app/scanners/)**
+
+- `security_header_scanner.py` - SecurityHeaderScanner class implementing ScanModule interface
+- Async security header analysis using httpx library
+- Reuses HttpProbe.probe_http() for HTTP requests to avoid code duplication
+- Analyzes 6 security headers: Content-Security-Policy, Strict-Transport-Security, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy
+- Reports missing headers with Severity.MEDIUM
+- Validates header configurations:
+  - CSP: warns on unsafe-inline/unsafe-eval
+  - HSTS: warns on max-age < 31536000 or missing includeSubDomains
+  - X-Frame-Options: warns on deprecated ALLOW-FROM
+  - X-Content-Type-Options: warns if not nosniff
+  - Referrer-Policy: warns on no-referrer/unsafe-url
+  - Permissions-Policy: presence check only
+- Configurable timeout (default 10.0s) with validation
+- Graceful error handling with Status.FAILED on unreachable targets
+- **Code quality fix:** Made determine_protocols() method public (renamed from \_determine_protocols) for reuse by other scanners
+- **Code quality fix:** Fixed HSTS validation to only check includeSubDomains when max-age exists
+
+**HTTP Method Scanner (backend/app/scanners/)**
+
+- `http_method_scanner.py` - HTTPMethodScanner class implementing ScanModule interface
+- Async HTTP method discovery using httpx library
+- Reuses HttpProbe.determine_protocols() for protocol detection
+- Tests 8 HTTP methods sequentially: GET, POST, PUT, DELETE, PATCH, OPTIONS, HEAD, TRACE
+- Methods returning 405 Method Not Allowed are considered not supported
+- Sends empty JSON body for POST/PUT/PATCH methods
+- Identifies risky methods: PUT, DELETE, PATCH (Severity.MEDIUM)
+- Identifies TRACE method as HIGH severity (potential XST attacks)
+- Configurable timeout (default 10.0s) with validation
+- Graceful error handling with Status.FAILED on unreachable targets
+
+**SSL Scanner (backend/app/scanners/)**
+
+- `ssl_scanner.py` - SSLScanner class implementing ScanModule interface
+- SSL/TLS certificate analysis using Python's built-in ssl module and socket
+- Extracts hostname and port from target URL (supports non-standard HTTPS ports)
+- Retrieves certificate information: subject, issuer, valid from, expiration date, TLS version
+- Detects expired certificates (Severity.HIGH)
+- Detects certificates nearing expiration within 30 days (Severity.MEDIUM)
+- Flags deprecated TLS versions (TLS 1.0, 1.1) as HIGH severity
+- Returns Status.FAILED for HTTP targets (SSL/TLS requires HTTPS)
+- Configurable timeout (default 10.0s) with validation
+- Graceful error handling with Status.FAILED on certificate retrieval failures
+- **Code quality fix:** Fixed datetime comparison error by making parsed SSL dates timezone-aware (UTC)
+- **Code quality fix:** Added None checks before strftime() calls to prevent AttributeError
+- **Code quality fix:** Fixed typo in near-expiry description
+- **Code quality fix:** Made \_get_certificate_info() synchronous (uses blocking socket operations)
+- **Code quality fix:** Added port extraction from target URL to support non-standard HTTPS ports
+
+**Technology Detector (backend/app/scanners/)**
+
+- `technology_detector.py` - TechnologyDetector class implementing ScanModule interface
+- Technology detection using httpx and BeautifulSoup4
+- Reuses HttpProbe.probe_http() and determine_protocols() for HTTP requests
+- Analyzes HTTP response headers for technology indicators (web servers, programming languages, frameworks)
+- Analyzes HTML source code for technology fingerprints (CMS, frontend frameworks)
+- Analyzes response cookies for technology indicators (programming languages)
+- Hardcoded detection rules for common technologies (nginx, Apache, WordPress, React, Vue, etc.)
+- Configurable timeout (default 10.0s) with validation
+- Graceful error handling with Status.FAILED on unreachable targets
+- **Code quality fix:** Added response_body and cookies to HttpProbe.probe_http() return dict for TechnologyDetector
+
 **Project Setup**
 
 - Created `.gitignore` with Python, Node.js, Next.js, IDE exclusions
@@ -118,6 +195,10 @@ Last updated: July 20, 2026
 - ServiceDetection uses hybrid port/banner approach - port-based lookup with banner confirmation
 - ServiceDetection trusts banner over port-based guess when available
 - ServiceDetection reports unknown services as informational findings with banner info
+- HttpProbe respects target protocol if specified, otherwise tries HTTPS then HTTP
+- HttpProbe splits findings into multiple objects (basic info, redirect chain, server header, response headers) for better report structure
+- HttpProbe records redirect chain as list of URLs with status codes
+- HttpProbe records response headers only from final response, not intermediate redirects
 
 ## Problems solved
 
@@ -150,6 +231,11 @@ Last updated: July 20, 2026
 - Scan Configuration implemented, tested, and verified
 - Port Scanner implemented, tested, and verified
 - Service Detection implemented, tested, and verified
+- HTTP Probe implemented, tested, and verified
+- Security Header Scanner implemented, tested, and verified
+- HTTP Method Scanner implemented, tested, and verified
+- SSL Scanner implemented, tested, and verified
+- Technology Detector implemented, tested, and verified
 - Git branch "backend" created and pushed to origin
 - Architecture.md updated to match current structure
 - Code reviews completed - critical bugs fixed
@@ -165,7 +251,7 @@ Last updated: July 20, 2026
 
 ## Next session starts with
 
-Implement HTTP Probe (context/feature-spec/09-http-probe.md) following the same pattern as previous scan modules.
+Implement Report generation (context/feature-spec/17-report-generator.md) following the feature specification.
 
 ## Open questions
 
