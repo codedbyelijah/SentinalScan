@@ -246,12 +246,14 @@ Last updated: July 21, 2026
 
 **Next:**
 
-- Implement remaining concrete scan modules (HTTP Probe, Security Header Scanner, SSL Scanner, Technology Detector)
-- Implement Report generation
+- Implement Content Discovery (feature 14)
+- Implement Result Normalizer (feature 15)
+- Implement Risk Analyzer (feature 16)
+- Implement Report generation (feature 17)
 
 ## Next session starts with
 
-Implement Report generation (context/feature-spec/17-report-generator.md) following the feature specification.
+Implement Content Discovery (context/feature-spec/14-content-discovery.md) following the feature specification.
 
 ## Open questions
 
