@@ -41,14 +41,14 @@ Update this file after every meaningful implementation change.
 - SSL Scanner implemented and verified.
 - Technology Detector implemented and verified.
 - Content Discovery implemented and verified.
+- Result Normalizer implemented and verified.
 
 ## In Progress
 
-- Implementing remaining concrete scan modules.
+- Implementing remaining backend services.
 
 ## Next Up
 
-- Implement Result Normalizer (feature 15)
 - Implement Risk Analyzer (feature 16)
 - Implement Report generation (feature 17)
 
