@@ -156,6 +156,19 @@ Last updated: July 21, 2026
 - **Code quality fix:** Made \_get_certificate_info() synchronous (uses blocking socket operations)
 - **Code quality fix:** Added port extraction from target URL to support non-standard HTTPS ports
 
+**Technology Detector (backend/app/scanners/)**
+
+- `technology_detector.py` - TechnologyDetector class implementing ScanModule interface
+- Technology detection using httpx and BeautifulSoup4
+- Reuses HttpProbe.probe_http() and determine_protocols() for HTTP requests
+- Analyzes HTTP response headers for technology indicators (web servers, programming languages, frameworks)
+- Analyzes HTML source code for technology fingerprints (CMS, frontend frameworks)
+- Analyzes response cookies for technology indicators (programming languages)
+- Hardcoded detection rules for common technologies (nginx, Apache, WordPress, React, Vue, etc.)
+- Configurable timeout (default 10.0s) with validation
+- Graceful error handling with Status.FAILED on unreachable targets
+- **Code quality fix:** Added response_body and cookies to HttpProbe.probe_http() return dict for TechnologyDetector
+
 **Project Setup**
 
 - Created `.gitignore` with Python, Node.js, Next.js, IDE exclusions
@@ -222,6 +235,7 @@ Last updated: July 21, 2026
 - Security Header Scanner implemented, tested, and verified
 - HTTP Method Scanner implemented, tested, and verified
 - SSL Scanner implemented, tested, and verified
+- Technology Detector implemented, tested, and verified
 - Git branch "backend" created and pushed to origin
 - Architecture.md updated to match current structure
 - Code reviews completed - critical bugs fixed
@@ -232,12 +246,11 @@ Last updated: July 21, 2026
 
 **Next:**
 
-- Implement remaining concrete scan modules (Technology Detector)
 - Implement Report generation
 
 ## Next session starts with
 
-Implement Technology Detector (context/feature-spec/13-technology-detector.md) following the same pattern as previous scan modules.
+Implement Report generation (context/feature-spec/17-report-generator.md) following the feature specification.
 
 ## Open questions
 

@@ -39,6 +39,7 @@ Update this file after every meaningful implementation change.
 - Security Header Scanner implemented and verified.
 - HTTP Method Scanner implemented and verified.
 - SSL Scanner implemented and verified.
+- Technology Detector implemented and verified.
 
 ## In Progress
 
@@ -46,7 +47,6 @@ Update this file after every meaningful implementation change.
 
 ## Next Up
 
-- Implement remaining concrete scan modules (Technology Detector).
 - Implement Report generation.
 
 ## Open Questions
