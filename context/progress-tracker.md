@@ -42,6 +42,7 @@ Update this file after every meaningful implementation change.
 - Technology Detector implemented and verified.
 - Content Discovery implemented and verified.
 - Result Normalizer implemented and verified.
+- Risk Analyzer implemented and verified.
 
 ## In Progress
 
@@ -49,13 +50,11 @@ Update this file after every meaningful implementation change.
 
 ## Next Up
 
-- Implement Risk Analyzer (feature 16)
 - Implement Report generation (feature 17)
 
 ## Open Questions
 
 - Define the technology detection heuristics.
-- Finalize the risk scoring methodology.
 - Determine the level of customization available for Custom Scan profiles.
 
 ## Architecture Decisions

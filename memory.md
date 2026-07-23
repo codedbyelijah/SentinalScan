@@ -194,6 +194,19 @@ Last updated: July 23, 2026
 - Defensive validation checks beyond Pydantic for data integrity assurance
 - Verification script created and all tests passed
 
+**Risk Analyzer (backend/app/services/)**
+
+- `risk_analysis_result.py` - RiskAnalysisResult model with results, overall_risk, security_summary, total_findings, warnings, errors
+- `risk_analyzer.py` - RiskAnalyzer class for analyzing scan results and calculating risk levels
+- Synchronous analysis service (no I/O operations)
+- Overall risk calculated as highest severity finding (CRITICAL > HIGH > MEDIUM > LOW > INFO)
+- Warnings = MEDIUM severity count
+- Errors = HIGH + CRITICAL severity count
+- Security summary generated based on overall risk level and finding counts
+- Custom RiskAnalysisError for structured error handling
+- Verification script created and all tests passed
+- Code review identified unused SEVERITY_ORDER constant (not critical)
+
 **Project Setup**
 
 - Created `.gitignore` with Python, Node.js, Next.js, IDE exclusions
@@ -263,6 +276,7 @@ Last updated: July 23, 2026
 - Technology Detector implemented, tested, and verified
 - Content Discovery implemented, tested, and verified
 - Result Normalizer implemented, tested, and verified
+- Risk Analyzer implemented, tested, and verified
 - Git branch "backend" created and pushed to origin
 - Architecture.md updated to match current structure
 - Code reviews completed - critical bugs fixed
@@ -273,12 +287,11 @@ Last updated: July 23, 2026
 
 **Next:**
 
-- Implement Risk Analyzer (feature 16)
 - Implement Report generation (feature 17)
 
 ## Next session starts with
 
-Implement Risk Analyzer (context/feature-spec/16-risk-analyzer.md) following the feature specification.
+Implement Report generation (context/feature-spec/17-report-generation.md) following the feature specification.
 
 ## Open questions
 
