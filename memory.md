@@ -1,4 +1,4 @@
-# Memory — SentinelScan Backend Implementation
+# Memory — SentinelScan Implementation
 
 Last updated: July 24, 2026
 
@@ -257,6 +257,42 @@ Last updated: July 24, 2026
 - **Code quality fix:** Added documentation about shutdown behavior (doesn't wait for running scans)
 - Verification script created and all tests passed
 
+**API Routes (backend/app/api/)**
+
+- `models.py` - Pydantic request/response models for all API endpoints (StartScanRequest, ScheduleScanRequest, ScanStatusResponse, etc.)
+- `scan_state_manager.py` - ScanStateManager for in-memory scan state tracking with thread-safe asyncio.Lock
+- `scan_routes.py` - FastAPI router implementing all required endpoints:
+  - POST /api/scan/start - Start scan with background execution
+  - GET /api/scan/status/{scan_id} - Get scan status
+  - GET /api/scan/results/{scan_id} - Get completed scan results
+  - POST /api/scan/schedule - Schedule one-time or recurring scans
+  - DELETE /api/scan/schedule/{job_id} - Cancel scheduled job
+  - GET /api/scan/schedule/status - Get scheduler status
+  - GET /report/export - Export report (PDF/HTML/JSON)
+- `main.py` - FastAPI application with lifespan management, module initialization, and CORS middleware
+- **Bug fix:** ServiceDetection excluded from module list in main.py (requires open_ports from PortScanner results)
+- **Security fix:** Added \_sanitize_filename() function to prevent path traversal in Content-Disposition header
+- **Thread safety fix:** Made all ScanStateManager methods async with asyncio.Lock for thread-safe state access
+- **Code cleanup:** Removed unused imports and reorganized imports
+
+**Frontend Scan Configuration UI**
+
+- `frontend/utils/api-client.ts` - Typed API client with startScan() and scheduleScan() functions
+- `frontend/components/dashboard/scan-configuration.tsx` - Scan configuration form component with:
+  - Target input with validation
+  - Scan mode selection (Full/Custom)
+  - Module checkboxes for custom scans (7 modules: PortScanner, HttpProbe, SecurityHeaderScanner, HTTPMethodScanner, SSLScanner, TechnologyDetector, ContentDiscovery)
+  - Execution mode toggle (Start Now/Schedule)
+  - Schedule configuration fields (one-time/recurring with interval options)
+  - Form validation using react-hook-form + zod
+  - Loading states and error handling
+- `frontend/app/page.tsx` - Integrated ScanConfiguration component with callback handlers
+- `frontend/app/layout.tsx` - Added suppressHydrationWarning to fix browser extension hydration mismatch
+- `backend/main.py` - Added CORSMiddleware to allow frontend-backend communication (allow_origins=["http://localhost:3000"])
+- **Bug fix:** Added "use client" directive to page.tsx to allow passing event handlers to Client Component
+- **Bug fix:** Zod v4.4.3 incompatible with @hookform/resolvers v5.4.0 - requires downgrade to zod@^3.23.8
+- **Testing:** Backend accepting POST requests, scans executing asynchronously with all 7 modules, completing successfully
+
 **Project Setup**
 
 - Created `.gitignore` with Python, Node.js, Next.js, IDE exclusions
@@ -330,22 +366,26 @@ Last updated: July 24, 2026
 - Report Generator implemented, tested, and verified
 - Report Export implemented, tested, and verified
 - Scan Scheduler implemented, tested, and verified
+- API Routes implemented, verified, and bug-fixed
+- Dashboard Layout implemented and verified
+- Scan Configuration UI implemented and verified
 - Git branch "backend" created and pushed to origin
 - Architecture.md updated to match current structure
 - Code reviews completed - critical bugs fixed
 
 **In Progress:**
 
-- Backend implementation (overall phase)
+- Frontend implementation (overall phase)
 
 **Next:**
 
-- Review remaining features (API routes, Frontend, CLI)
-- APScheduler dependency needs to be installed by user
+- Downgrade Zod to v3.x for form validation compatibility
+- Implement remaining frontend components (progress view, report view)
+- CLI implementation
 
 ## Next session starts with
 
-Review feature specifications for remaining backend components (features 20-26) to determine next implementation priority. Likely starting with API routes (FastAPI endpoints) to expose backend services.
+Downgrade Zod to v3.x for form validation compatibility, then implement remaining frontend components (progress view, report view).
 
 ## Open questions
 

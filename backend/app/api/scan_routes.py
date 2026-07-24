@@ -35,6 +35,7 @@ from app.services.scan_scheduler import ScanScheduler, ScheduleInterval as Sched
 from app.reports.report_generator import ReportGenerator, ReportGenerationError
 from app.reports.report_export import ReportExport, ReportExportError
 from app.scanners.scan_module import ScanModule
+from app.scanners.reachability_checker import ReachabilityChecker, ReachabilityError
 
 
 logger = logging.getLogger(__name__)
@@ -45,6 +46,7 @@ scan_orchestrator: ScanOrchestrator | None = None
 scan_scheduler: ScanScheduler | None = None
 scan_configuration: ScanConfiguration | None = None
 target_validator: TargetValidator | None = None
+reachability_checker: ReachabilityChecker | None = None
 result_normalizer: ResultNormalizer | None = None
 risk_analyzer: RiskAnalyzer | None = None
 report_generator: ReportGenerator | None = None
@@ -91,11 +93,12 @@ def initialize_dependencies(
         output_dir: Directory for report generation
     """
     global scan_state_manager, scan_orchestrator, scan_scheduler
-    global scan_configuration, target_validator, result_normalizer, risk_analyzer
+    global scan_configuration, target_validator, reachability_checker, result_normalizer, risk_analyzer
     global report_generator, report_export, available_modules
     
     # Initialize services
     target_validator = TargetValidator()
+    reachability_checker = ReachabilityChecker()
     scan_configuration = ScanConfiguration([m.__class__.__name__ for m in modules])
     scan_orchestrator = ScanOrchestrator(modules)
     scan_scheduler = ScanScheduler(scan_orchestrator)
@@ -129,15 +132,30 @@ async def execute_scan_task(scan_id: str, scan_request: ScanRequest) -> None:
         scan_id: The scan ID
         scan_request: The scan request
     """
-    global scan_orchestrator, scan_state_manager, result_normalizer, risk_analyzer
+    global scan_orchestrator, scan_state_manager, result_normalizer, risk_analyzer, reachability_checker
     
-    if not scan_state_manager or not scan_orchestrator:
+    if not scan_state_manager or not scan_orchestrator or not reachability_checker:
         logger.error(f"Scan {scan_id}: Dependencies not initialized")
         return
     
     try:
         # Update status to running
         await scan_state_manager.update_status(scan_id, ScanStatus.RUNNING)
+        
+        # Check reachability before scanning (architecture invariant #2)
+        try:
+            reachability_result = await reachability_checker.check(scan_request.target)
+            if not reachability_result.reachable:
+                error_msg = f"Target {scan_request.target.normalized_target} is not reachable"
+                logger.warning(f"Scan {scan_id}: {error_msg}")
+                await scan_state_manager.set_error(scan_id, error_msg)
+                return
+            logger.info(f"Scan {scan_id}: Target reachable (method: {reachability_result.method_used}, response_time: {reachability_result.response_time_ms}ms)")
+        except ReachabilityError as e:
+            error_msg = f"Reachability check failed: {e.message}"
+            logger.error(f"Scan {scan_id}: {error_msg}")
+            await scan_state_manager.set_error(scan_id, error_msg)
+            return
         
         # Execute scan
         results = await scan_orchestrator.execute_scan(scan_request)
