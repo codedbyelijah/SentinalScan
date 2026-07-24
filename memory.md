@@ -235,6 +235,28 @@ Last updated: July 24, 2026
 - **Robustness fix:** Added constructor validation to ensure output path is a directory if it exists
 - Verification script created and all tests passed
 
+**Scan Scheduler (backend/app/services/)**
+
+- `scan_scheduler.py` - ScanScheduler class for automated scan scheduling using APScheduler
+- One-time scan scheduling with specific datetime (validates datetime is in future)
+- Recurring scan scheduling with intervals: hourly, daily, weekly, custom (minutes)
+- Job cancellation by ID
+- Duplicate job ID prevention (checks existing jobs and catches ConflictingIdError)
+- Status retrieval (running state, job count, job details with next run times)
+- Auto-generated job IDs based on target + schedule parameters
+- Optional custom job IDs with sanitization
+- Job ID sanitization removes unsafe characters, collapses hyphens, limits to 200 chars
+- Async scan execution wrapped in asyncio.run() for APScheduler compatibility
+- Error handling with logging (no automatic retries)
+- Uses MemoryJobStore (in-memory, schedules lost on restart - aligns with runtime-only storage)
+- Custom ScanSchedulerError for structured error handling
+- ScheduleInterval enum for type-safe interval specification
+- **Code quality fix:** Added run_at validation to reject past/current datetimes
+- **Code quality fix:** Wrapped add_job in try/except to catch ConflictingIdError and convert to ScanSchedulerError
+- **Code quality fix:** Added \_sanitize_job_id method to clean special characters from job IDs
+- **Code quality fix:** Added documentation about shutdown behavior (doesn't wait for running scans)
+- Verification script created and all tests passed
+
 **Project Setup**
 
 - Created `.gitignore` with Python, Node.js, Next.js, IDE exclusions
@@ -307,6 +329,7 @@ Last updated: July 24, 2026
 - Risk Analyzer implemented, tested, and verified
 - Report Generator implemented, tested, and verified
 - Report Export implemented, tested, and verified
+- Scan Scheduler implemented, tested, and verified
 - Git branch "backend" created and pushed to origin
 - Architecture.md updated to match current structure
 - Code reviews completed - critical bugs fixed
@@ -317,12 +340,12 @@ Last updated: July 24, 2026
 
 **Next:**
 
-- Backend core implementation complete
-- Review remaining features (Report Export, Scan Scheduler, API routes, Frontend, CLI)
+- Review remaining features (API routes, Frontend, CLI)
+- APScheduler dependency needs to be installed by user
 
 ## Next session starts with
 
-Review feature specifications for remaining components (features 18-26) to determine next implementation priority.
+Review feature specifications for remaining backend components (features 20-26) to determine next implementation priority. Likely starting with API routes (FastAPI endpoints) to expose backend services.
 
 ## Open questions
 
