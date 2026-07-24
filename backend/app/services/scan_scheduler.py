@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import re
 from datetime import datetime
 from enum import Enum
 
@@ -7,6 +8,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.date import DateTrigger
 from apscheduler.triggers.interval import IntervalTrigger
 from apscheduler.jobstores.memory import MemoryJobStore
+from apscheduler.jobstores.base import ConflictingIdError
 
 from app.orchestrator.scan_orchestrator import ScanOrchestrator
 from app.models.scan_request import ScanRequest
@@ -72,6 +74,9 @@ class ScanScheduler:
     def shutdown(self) -> None:
         """
         Shutdown the scheduler and cancel all jobs.
+        
+        Note: This does not wait for currently executing scans to complete.
+        Use wait=True in the scheduler.shutdown call if you need to wait.
         """
         if not self._started:
             logger.warning("Scheduler is not running, nothing to shutdown")
@@ -80,6 +85,30 @@ class ScanScheduler:
         self.scheduler.shutdown(wait=False)
         self._started = False
         logger.info("ScanScheduler shutdown")
+    
+    def _sanitize_job_id(self, job_id: str) -> str:
+        """
+        Sanitize job ID to only contain safe characters.
+        
+        Removes or replaces characters that may cause issues with
+        APScheduler jobstores.
+        
+        Args:
+            job_id: The job ID to sanitize
+            
+        Returns:
+            Sanitized job ID
+        """
+        # Replace unsafe characters with hyphens
+        sanitized = re.sub(r'[^\w\-]', '-', job_id)
+        # Remove consecutive hyphens
+        sanitized = re.sub(r'-+', '-', sanitized)
+        # Strip leading/trailing hyphens
+        sanitized = sanitized.strip('-')
+        # Limit length to 200 characters
+        if len(sanitized) > 200:
+            sanitized = sanitized[:200]
+        return sanitized
     
     def schedule_one_time(
         self,
@@ -92,35 +121,40 @@ class ScanScheduler:
         
         Args:
             scan_request: ScanRequest containing target and configuration
-            run_at: Datetime when the scan should execute
+            run_at: Datetime when the scan should execute (must be in the future)
             job_id: Optional custom job ID. Auto-generated if not provided.
             
         Returns:
             The job ID for the scheduled scan
             
         Raises:
-            ScanSchedulerError: If job with same ID already exists
+            ScanSchedulerError: If job with same ID already exists or run_at is in the past
         """
         if not self._started:
             raise ScanSchedulerError("Scheduler must be started before scheduling jobs")
         
+        # Validate run_at is in the future
+        if run_at <= datetime.now():
+            raise ScanSchedulerError("run_at must be in the future")
+        
         # Generate job ID if not provided
         if job_id is None:
-            target_id = scan_request.target.normalized_target.replace("://", "-").replace("/", "-").replace(":", "-")
+            target_id = self._sanitize_job_id(scan_request.target.normalized_target)
             job_id = f"{target_id}-onetime-{run_at.strftime('%Y%m%d-%H%M%S')}"
-        
-        # Check for duplicate job ID
-        if self.scheduler.get_job(job_id):
-            raise ScanSchedulerError(f"Job with ID '{job_id}' already exists")
+        else:
+            job_id = self._sanitize_job_id(job_id)
         
         # Schedule the job
-        self.scheduler.add_job(
-            func=self._execute_scan,
-            trigger=DateTrigger(run_date=run_at),
-            args=[scan_request],
-            id=job_id,
-            name=f"One-time scan for {scan_request.target.normalized_target}"
-        )
+        try:
+            self.scheduler.add_job(
+                func=self._execute_scan,
+                trigger=DateTrigger(run_date=run_at),
+                args=[scan_request],
+                id=job_id,
+                name=f"One-time scan for {scan_request.target.normalized_target}"
+            )
+        except ConflictingIdError:
+            raise ScanSchedulerError(f"Job with ID '{job_id}' already exists")
         
         logger.info(f"Scheduled one-time scan with job ID: {job_id} at {run_at}")
         return job_id
@@ -158,15 +192,13 @@ class ScanScheduler:
         
         # Generate job ID if not provided
         if job_id is None:
-            target_id = scan_request.target.normalized_target.replace("://", "-").replace("/", "-").replace(":", "-")
+            target_id = self._sanitize_job_id(scan_request.target.normalized_target)
             if interval == ScheduleInterval.CUSTOM:
                 job_id = f"{target_id}-custom-{interval_value}min"
             else:
                 job_id = f"{target_id}-{interval.value}"
-        
-        # Check for duplicate job ID
-        if self.scheduler.get_job(job_id):
-            raise ScanSchedulerError(f"Job with ID '{job_id}' already exists")
+        else:
+            job_id = self._sanitize_job_id(job_id)
         
         # Determine trigger based on interval type
         if interval == ScheduleInterval.HOURLY:
@@ -181,13 +213,16 @@ class ScanScheduler:
             raise ScanSchedulerError(f"Unsupported interval: {interval}")
         
         # Schedule the job
-        self.scheduler.add_job(
-            func=self._execute_scan,
-            trigger=trigger,
-            args=[scan_request],
-            id=job_id,
-            name=f"{interval.value} scan for {scan_request.target.normalized_target}"
-        )
+        try:
+            self.scheduler.add_job(
+                func=self._execute_scan,
+                trigger=trigger,
+                args=[scan_request],
+                id=job_id,
+                name=f"{interval.value} scan for {scan_request.target.normalized_target}"
+            )
+        except ConflictingIdError:
+            raise ScanSchedulerError(f"Job with ID '{job_id}' already exists")
         
         logger.info(f"Scheduled recurring scan with job ID: {job_id} ({interval.value})")
         return job_id

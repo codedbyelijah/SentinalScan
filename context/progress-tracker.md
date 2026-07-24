@@ -46,6 +46,7 @@ Update this file after every meaningful implementation change.
 - Report Generator implemented and verified.
 - Report Export implemented and verified.
 - Scan Scheduler implemented and verified.
+- API Routes implemented, verified, and bug-fixed.
 
 ## In Progress
 
