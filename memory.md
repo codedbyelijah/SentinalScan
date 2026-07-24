@@ -1,6 +1,6 @@
 # Memory — SentinelScan Backend Implementation
 
-Last updated: July 23, 2026
+Last updated: July 24, 2026
 
 ## What was built
 
@@ -222,6 +222,19 @@ Last updated: July 23, 2026
 - **Code quality fix:** Removed unused import os
 - **Code quality fix:** Removed unnecessary template directory setup and FileSystemLoader
 
+**Report Export (backend/app/reports/)**
+
+- `report_export.py` - ReportExport class for exporting generated security assessment reports
+- Export by exact filename with format-specific return types (bytes for PDF/HTML, dict for JSON)
+- Search by target identifier substring, returns most recent match
+- List all available reports with metadata (filename, format, size, modified time)
+- Custom ReportExportError for structured error handling
+- Configurable output directory (default `./reports/`)
+- **Security fix:** Added filename validation to prevent path traversal attacks (rejects `..`, `/`, `\`)
+- **Security fix:** Added target identifier validation (minimum 3 characters) to prevent overly broad matching
+- **Robustness fix:** Added constructor validation to ensure output path is a directory if it exists
+- Verification script created and all tests passed
+
 **Project Setup**
 
 - Created `.gitignore` with Python, Node.js, Next.js, IDE exclusions
@@ -293,6 +306,7 @@ Last updated: July 23, 2026
 - Result Normalizer implemented, tested, and verified
 - Risk Analyzer implemented, tested, and verified
 - Report Generator implemented, tested, and verified
+- Report Export implemented, tested, and verified
 - Git branch "backend" created and pushed to origin
 - Architecture.md updated to match current structure
 - Code reviews completed - critical bugs fixed
