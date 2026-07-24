@@ -45,6 +45,7 @@ Update this file after every meaningful implementation change.
 - Risk Analyzer implemented and verified.
 - Report Generator implemented and verified.
 - Report Export implemented and verified.
+- Scan Scheduler implemented and verified.
 
 ## In Progress
 
